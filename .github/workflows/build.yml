@@ -8,6 +8,8 @@ on:
 jobs:
   build-apk:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: "📥 Checkout"
@@ -60,9 +62,18 @@ jobs:
         working-directory: android
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease
+          ./gradlew assembleRelease --stacktrace
+
+      - name: "📋 List APKs"
+        if: always()
+        run: |
+          echo "=== Searching for APKs ==="
+          find android -name "*.apk" 2>/dev/null || echo "No APKs found"
+          echo "=== Build output directory ==="
+          ls -la android/app/build/outputs/apk/ 2>/dev/null || echo "No output directory"
 
       - name: "📤 Upload APK"
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: membridge-gallery-release
