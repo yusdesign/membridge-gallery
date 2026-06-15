@@ -47,16 +47,21 @@ jobs:
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/membridge.keystore
 
+      - name: "🔐 Create keystore.properties"
+        run: |
+          cat > android/keystore.properties << EOF
+          storeFile=app/membridge.keystore
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          EOF
+
       - name: "📦 Build Release APK"
         working-directory: android
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease \
-            -Pandroid.injected.signing.store.file=membridge.keystore \
-            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
-            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
-            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
-         
+          ./gradlew assembleRelease
+
       - name: "📤 Upload APK"
         uses: actions/upload-artifact@v4
         with:
