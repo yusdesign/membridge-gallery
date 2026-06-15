@@ -49,10 +49,19 @@ jobs:
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/membridge.keystore
 
+      - name: "📋 Verify keystore location"
+        run: |
+          echo "=== Keystore file ==="
+          ls -la android/membridge.keystore
+          echo "=== Current dir ==="
+          pwd
+          echo "=== Android dir contents ==="
+          ls -la android/
+
       - name: "🔐 Create keystore.properties"
         run: |
           cat > android/keystore.properties << EOF
-          storeFile=../membridge.keystore
+          storeFile=membridge.keystore
           storePassword=${{ secrets.KEYSTORE_PASSWORD }}
           keyAlias=${{ secrets.KEY_ALIAS }}
           keyPassword=${{ secrets.KEY_PASSWORD }}
