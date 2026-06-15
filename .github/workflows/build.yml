@@ -47,12 +47,12 @@ jobs:
 
       - name: "🔑 Decode Keystore"
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/membridge.keystore
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/membridge.keystore
 
       - name: "🔐 Create keystore.properties"
         run: |
           cat > android/keystore.properties << EOF
-          storeFile=app/membridge.keystore
+          storeFile=../membridge.keystore
           storePassword=${{ secrets.KEYSTORE_PASSWORD }}
           keyAlias=${{ secrets.KEY_ALIAS }}
           keyPassword=${{ secrets.KEY_PASSWORD }}
@@ -72,7 +72,7 @@ jobs:
               signingConfigs {
                   release {
                       if (keystorePropertiesFile.exists()) {
-                          storeFile file(keystoreProperties['storeFile'])
+                          storeFile rootProject.file(keystoreProperties['storeFile'])
                           storePassword keystoreProperties['storePassword']
                           keyAlias keystoreProperties['keyAlias']
                           keyPassword keystoreProperties['keyPassword']
