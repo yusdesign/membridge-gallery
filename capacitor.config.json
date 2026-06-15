@@ -1,7 +1,7 @@
 {
   "appId": "dev.yusdesign.membridge.gallery",
   "appName": "MemBridge Gallery",
-  "webDir": ".",
+  "webDir": "www",
   "server": {
     "androidScheme": "https"
   },
