@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>MemBridge Gallery</title>
+  <link rel="stylesheet" href="css/storyboard.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Status Bar -->
+    <div id="status-bar">
+      <span id="status-title">🏛️ MemBridge</span>
+      <span id="status-info"></span>
+    </div>
+
+    <!-- Wing Selector -->
+    <div id="wing-selector">
+      <button class="wing-chip active" data-wing="morning">🌅 Morning</button>
+      <button class="wing-chip" data-wing="afternoon">☀️ Afternoon</button>
+      <button class="wing-chip" data-wing="evening">🌆 Evening</button>
+      <button class="wing-chip" data-wing="night">🌙 Night</button>
+      <button class="wing-chip" data-wing="people">👤 People</button>
+      <button class="wing-chip" data-wing="places">📍 Places</button>
+    </div>
+
+    <!-- Search -->
+    <div id="search-bar">
+      <input type="text" id="search-input" placeholder="🔍 Search your palace...">
+    </div>
+
+    <!-- Storyboard Timeline -->
+    <div id="storyboard"></div>
+
+    <!-- Empty State -->
+    <div id="empty-state" style="display:none;">
+      <div class="empty-icon">🏛️</div>
+      <h2>Your palace is empty</h2>
+      <p>Tap below to mine your camera roll</p>
+      <button id="mine-btn" class="btn-primary">🔍 Mine Photos</button>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading">
+      <div class="spinner"></div>
+      <p>Building your memory palace...</p>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/membridge-db.js"></script>
+  <script src="js/photo-miner.js"></script>
+  <script src="js/storyboard.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
