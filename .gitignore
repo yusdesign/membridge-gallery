@@ -4,3 +4,5 @@ dist/
 .capacitor/
 *.apk
 .DS_Store
+membridge.keystore
+*.sh
