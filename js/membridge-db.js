@@ -101,54 +101,42 @@ const MemBridgeDB = (() => {
     CREATE INDEX IF NOT EXISTS idx_scene_members_scene ON scene_members(scene_id);
   `;
 
-  // Initialize with screen debug
   async function init() {
-    const debugEl = document.getElementById('status-info');
-  
-    // Capture console.log
-    const logs = [];
-    const origLog = console.log;
-    const origErr = console.error;
-  
-    console.log = function(...args) {
-      logs.push(args.join(' '));
-      origLog.apply(console, args);
-    };
-    console.error = function(...args) {
-      logs.push('❌ ' + args.join(' '));
-      origErr.apply(console, args);
-    };
-  
-    debugEl.textContent = 'Init...';
-  
-    const ok = await MemBridgeDB.init();
-  
-    if (!ok) {
-      debugEl.textContent = 'DB Error - tap to see logs';
-      debugEl.style.color = '#FF1744';
-      debugEl.onclick = () => {
-        alert('Debug Logs:\n\n' + logs.slice(-20).join('\n'));
-      };
-      showLoading(false);
-      return;
+    try {
+      console.log('=== Capacitor SQLite Debug ===');
+      console.log('window.Capacitor:', !!window.Capacitor);
+      console.log('window.sqlitePlugin:', !!window.sqlitePlugin);
+      console.log('Capacitor.Plugins:', !!window.Capacitor?.Plugins);
+    
+      if (window.Capacitor?.Plugins) {
+        console.log('Available plugins:', Object.keys(window.Capacitor.Plugins));
+      }
+
+      // Try the community plugin way
+      const sqlitePlugin = window.sqlitePlugin || 
+                           window.Capacitor?.Plugins?.CapacitorSQLite ||
+                           window.Capacitor?.Plugins?.SQLite;
+    
+      if (!sqlitePlugin) {
+        console.error('No SQLite plugin found');
+        return false;
+      }
+
+      db = await sqlitePlugin.createConnection(
+        DB_NAME, 
+        false, 
+        'no-encryption', 
+        1, 
+        false
+      );
+      await db.open();
+      await db.execute(SCHEMA);
+      console.log('🏛️  MemBridge DB initialized');
+      return true;
+    } catch (e) {
+      console.error('DB init failed:', e.message, e.stack);
+      return false;
     }
-
-    debugEl.textContent = 'DB OK';
-    debugEl.style.color = '#00E676';
-  
-    const status = await MemBridgeDB.getStatus();
-    debugEl.textContent = `${status.totalMemories} photos · ${status.totalScenes} scenes`;
-    debugEl.style.color = '#e0e0e0';
-    debugEl.onclick = null;
-
-    if (status.totalMemories === 0) {
-      showEmptyState(true);
-    } else {
-      showEmptyState(false);
-      await loadWing(currentWing);
-    }
-
-    showLoading(false);
   }
 
   async function addMemory(memory) {
