@@ -18,72 +18,60 @@
   let currentWing = 'morning';
 
   // Initialize
-  // Initialize with visible debug
   async function init() {
     const debugEl = document.getElementById('status-info');
   
-    // Capture logs
-    const logs = [];
-    const origLog = console.log;
-    const origErr = console.error;
-  
-    console.log = function(...args) {
-      logs.push(args.join(' '));
-      origLog.apply(console, args);
-    };
-    console.error = function(...args) {
-      logs.push('ERR: ' + args.join(' '));
-      origErr.apply(console, args);
-    };
-  
-    debugEl.textContent = 'Init...';
-  
-    // Show debug button
-    const debugBtn = document.createElement('button');
-    debugBtn.id = 'debug-btn';
-    debugBtn.textContent = 'Show Logs';
-    debugBtn.style.cssText = 'display:none;margin:8px;padding:12px;background:#FF1744;color:white;border:none;border-radius:8px;font-size:14px;width:90%;';
-    debugBtn.onclick = () => {
+    // Build log string directly
+    let logText = '';
+    function addLog(msg) {
+      logText += msg + '\n';
+      // Show immediately on screen
       storyboardEl.innerHTML = '<div style="padding:16px;color:#e0e0e0;font-family:monospace;font-size:11px;white-space:pre-wrap;word-break:break-all;">' + 
-        logs.join('\n') + '</div>';
-    };
-    document.getElementById('app').appendChild(debugBtn);
+        logText + '</div>';
+    }
+  
+    addLog('Starting init...');
+    addLog('window.Capacitor: ' + !!window.Capacitor);
+    addLog('window.sqlitePlugin: ' + !!window.sqlitePlugin);
+  
+    if (window.Capacitor && window.Capacitor.Plugins) {
+      const plugins = Object.keys(window.Capacitor.Plugins);
+      addLog('Plugins: ' + plugins.join(', '));
+    }
   
     try {
       const ok = await MemBridgeDB.init();
+      addLog('MemBridgeDB.init() returned: ' + ok);
     
       if (!ok) {
         debugEl.textContent = '❌ DB Error';
         debugEl.style.color = '#FF1744';
-        debugBtn.style.display = 'block';
         showLoading(false);
         showEmptyState(false);
         return;
       }
 
-      debugEl.textContent = '✅ DB OK';
-      debugEl.style.color = '#00E676';
-      debugBtn.style.display = 'none';
-    
       const status = await MemBridgeDB.getStatus();
-      debugEl.textContent = `${status.totalMemories} photos · ${status.totalScenes} scenes`;
-      debugEl.style.color = '#e0e0e0';
-
+      addLog('Status: ' + JSON.stringify(status));
+      debugEl.textContent = status.totalMemories + ' photos';
+      debugEl.style.color = '#00E676';
+    
       if (status.totalMemories === 0) {
         showEmptyState(true);
       } else {
         showEmptyState(false);
         await loadWing(currentWing);
+        storyboardEl.innerHTML = '';
+        renderScenesFromDB();
       }
-    } catch (e) {
-      logs.push('CRASH: ' + e.message);
-      debugEl.textContent = '❌ Crash - tap button';
+    } catch(e) {
+      addLog('CRASH: ' + e.message);
+      debugEl.textContent = '❌ Crash';
       debugEl.style.color = '#FF1744';
-      debugBtn.style.display = 'block';
       showLoading(false);
       showEmptyState(false);
     }
-
+  
     showLoading(false);
   }
 
