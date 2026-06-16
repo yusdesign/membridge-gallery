@@ -101,30 +101,54 @@ const MemBridgeDB = (() => {
     CREATE INDEX IF NOT EXISTS idx_scene_members_scene ON scene_members(scene_id);
   `;
 
+  // Initialize with screen debug
   async function init() {
-    try {
-      // Use Capacitor plugin registry
-      const { CapacitorSQLite } = Capacitor.Plugins;
-      if (!CapacitorSQLite) {
-        console.error('SQLite plugin not available');
-        return false;
-      }
-    
-      db = await CapacitorSQLite.createConnection(
-        DB_NAME, 
-        false, 
-        'no-encryption', 
-        1, 
-        false
-      );
-      await db.open();
-      await db.execute(SCHEMA);
-      console.log('🏛️  MemBridge DB initialized');
-      return true;
-    } catch (e) {
-      console.error('DB init failed:', e);
-      return false;
+    const debugEl = document.getElementById('status-info');
+  
+    // Capture console.log
+    const logs = [];
+    const origLog = console.log;
+    const origErr = console.error;
+  
+    console.log = function(...args) {
+      logs.push(args.join(' '));
+      origLog.apply(console, args);
+    };
+    console.error = function(...args) {
+      logs.push('❌ ' + args.join(' '));
+      origErr.apply(console, args);
+    };
+  
+    debugEl.textContent = 'Init...';
+  
+    const ok = await MemBridgeDB.init();
+  
+    if (!ok) {
+      debugEl.textContent = 'DB Error - tap to see logs';
+      debugEl.style.color = '#FF1744';
+      debugEl.onclick = () => {
+        alert('Debug Logs:\n\n' + logs.slice(-20).join('\n'));
+      };
+      showLoading(false);
+      return;
     }
+
+    debugEl.textContent = 'DB OK';
+    debugEl.style.color = '#00E676';
+  
+    const status = await MemBridgeDB.getStatus();
+    debugEl.textContent = `${status.totalMemories} photos · ${status.totalScenes} scenes`;
+    debugEl.style.color = '#e0e0e0';
+    debugEl.onclick = null;
+
+    if (status.totalMemories === 0) {
+      showEmptyState(true);
+    } else {
+      showEmptyState(false);
+      await loadWing(currentWing);
+    }
+
+    showLoading(false);
   }
 
   async function addMemory(memory) {
