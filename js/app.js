@@ -21,7 +21,6 @@
   // Initialize with visible debug
   async function init() {
     const debugEl = document.getElementById('status-info');
-    const storyboardEl = document.getElementById('storyboard');
   
     // Capture logs
     const logs = [];
