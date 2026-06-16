@@ -102,14 +102,21 @@ const MemBridgeDB = (() => {
   `;
 
   async function init() {
-    const SQLite = window.capacitorSQLite;
-    if (!SQLite) {
-      console.error('SQLite plugin not available');
-      return false;
-    }
-
     try {
-      db = await SQLite.createConnection(DB_NAME, false, 'no-encryption', 1, false);
+      // Use Capacitor plugin registry
+      const { CapacitorSQLite } = Capacitor.Plugins;
+      if (!CapacitorSQLite) {
+        console.error('SQLite plugin not available');
+        return false;
+      }
+    
+      db = await CapacitorSQLite.createConnection(
+        DB_NAME, 
+        false, 
+        'no-encryption', 
+        1, 
+        false
+      );
       await db.open();
       await db.execute(SCHEMA);
       console.log('🏛️  MemBridge DB initialized');
