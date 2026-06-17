@@ -44,8 +44,8 @@ jobs:
           mkdir -p web
           cp web.html web/index.html
           cp -r css web/
-          cp js/membridge-web.js web/js/
-          cp js/web-app.js web/js/
+          cp -r js/membridge-web.js web/js/
+          cp -r js/web-app.js web/js/
      
       - name: "📱 Add Android"
         run: npx cap add android
