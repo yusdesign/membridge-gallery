@@ -46,6 +46,12 @@ jobs:
           cp -r css web/
           cp js/membridge-web.js web/js/
           cp js/web-app.js web/js/
+
+      - name: "🚀 Deploy to GitHub Pages"
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./web
      
       - name: "📱 Add Android"
         run: npx cap add android

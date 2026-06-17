@@ -223,6 +223,52 @@
     document.body.appendChild(overlay);
   }
 
+  // Pick photos button
+  const pickBtn = document.getElementById('pick-photos-btn');
+  const photoInput = document.getElementById('photo-input');
+
+  if (pickBtn && photoInput) {
+    pickBtn.addEventListener('click', () => photoInput.click());
+  
+    photoInput.addEventListener('change', async (e) => {
+      const files = e.target.files;
+      if (!files.length) return;
+    
+      showLoading(true);
+      showEmptyState(false);
+    
+      let indexed = 0;
+      for (const file of files) {
+        const reader = new FileReader();
+        const dataUrl = await new Promise((resolve) => {
+          reader.onload = () => resolve(reader.result);
+          reader.readAsDataURL(file);
+        });
+      
+        const memory = {
+          wing: 'places',
+          room: 'imported_' + new Date().toISOString().split('T')[0],
+          hall: 'moment',
+          title: file.name,
+          content: JSON.stringify({ filename: file.name, size: file.size }),
+          filePath: dataUrl,
+          fileType: file.name.split('.').pop() || 'jpg',
+          keywords: ['imported', file.name.split('.')[0]],
+          metadata: { timestamp: new Date().toISOString(), dimensions: {} },
+        };
+      
+        await MemBridgeDB.addMemory(memory);
+        indexed++;
+      }
+    
+      await MemBridgeDB.recordMining('manual_import', files.length, indexed, 'completed');
+      const status = await MemBridgeDB.getStatus();
+      statusInfoEl.textContent = `${status.totalMemories} photos · ${status.totalScenes} scenes`;
+      await loadWing('places');
+      showLoading(false);
+    });
+  }
+
   // Mine button
   mineBtn.addEventListener('click', async () => {
     showLoading(true);
