@@ -39,13 +39,14 @@ jobs:
           cp -r css www/
           cp -r js www/
 
-      - name: "🌐 Prepare web (Browser)"
+      - name: "🌐 Prepare web demo"
         run: |
           mkdir -p web
           cp web.html web/index.html
           cp -r css web/
-          cp -r js web/
-
+          cp js/membridge-web.js web/js/
+          cp js/web-app.js web/js/
+     
       - name: "📱 Add Android"
         run: npx cap add android
 

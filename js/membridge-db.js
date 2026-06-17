@@ -143,14 +143,23 @@ const MemBridgeDB = (() => {
       statement: 'SELECT id FROM memories WHERE content_hash = ?',
       values: [hash]
     });
-    if (existing.values && existing.values.length > 0) return existing.values[0].id;
+    if (existing.values && existing.values.length > 0) {
+      return existing.values[0].id;
+    }
 
     const result = await db.run({
       database: DB_NAME,
       statement: `INSERT INTO memories (wing, room, hall, title, content, content_hash, file_path, file_type, keywords, metadata, created_at, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      values: [memory.wing, memory.room, memory.hall, memory.title, memory.content, hash, memory.filePath, memory.fileType, memory.keywords.join(','), JSON.stringify(memory.metadata), new Date().toISOString(), new Date().toISOString()]
+      values: [
+        memory.wing, memory.room, memory.hall,
+        memory.title, memory.content, hash,
+        memory.filePath, memory.fileType,
+        memory.keywords.join(','), JSON.stringify(memory.metadata),
+        new Date().toISOString(), new Date().toISOString()
+      ]
     });
+
     return result.changes.lastId;
   }
 
@@ -159,6 +168,15 @@ const MemBridgeDB = (() => {
       database: DB_NAME,
       statement: 'SELECT * FROM memories WHERE wing = ? ORDER BY created_at DESC LIMIT ?',
       values: [wing, limit]
+    });
+    return (result.values || []).map(rowToMemory);
+  }
+
+  async function getMemoriesByRoom(wing, room) {
+    const result = await db.query({
+      database: DB_NAME,
+      statement: 'SELECT * FROM memories WHERE wing = ? AND room = ? ORDER BY created_at DESC',
+      values: [wing, room]
     });
     return (result.values || []).map(rowToMemory);
   }
@@ -241,6 +259,43 @@ const MemBridgeDB = (() => {
   }
 
   // ==========================================
+  // RELATIONS
+  // ==========================================
+
+  async function addRelation(sourceId, targetId, type) {
+    await db.run({
+      database: DB_NAME,
+      statement: 'INSERT OR IGNORE INTO relations (source_id, target_id, relation_type) VALUES (?, ?, ?)',
+      values: [sourceId, targetId, type]
+    });
+  }
+
+  async function getRelatedMemories(memoryId, limit = 5) {
+    const result = await db.query({
+      database: DB_NAME,
+      statement: `SELECT m.* FROM memories m
+       JOIN relations r ON m.id = r.target_id
+       WHERE r.source_id = ?
+       ORDER BY r.weight DESC
+       LIMIT ?`,
+      values: [memoryId, limit]
+    });
+    return (result.values || []).map(rowToMemory);
+  }
+
+  // ==========================================
+  // TRIPLES
+  // ==========================================
+
+  async function addTriple(subject, predicate, object) {
+    await db.run({
+      database: DB_NAME,
+      statement: 'INSERT INTO triples (subject, predicate, object, valid_from) VALUES (?, ?, ?, ?)',
+      values: [subject, predicate, object, new Date().toISOString()]
+    });
+  }
+
+  // ==========================================
   // STATUS
   // ==========================================
 
@@ -248,11 +303,13 @@ const MemBridgeDB = (() => {
     const total = await db.query({ database: DB_NAME, statement: 'SELECT COUNT(*) as c FROM memories', values: [] });
     const scenes = await db.query({ database: DB_NAME, statement: 'SELECT COUNT(*) as c FROM scenes', values: [] });
     const triples = await db.query({ database: DB_NAME, statement: 'SELECT COUNT(*) as c FROM triples', values: [] });
+    const relations = await db.query({ database: DB_NAME, statement: 'SELECT COUNT(*) as c FROM relations', values: [] });
 
     return {
       totalMemories: total.values[0].c,
       totalScenes: scenes.values[0].c,
       totalTriples: triples.values[0].c,
+      totalRelations: relations.values[0].c,
     };
   }
 
@@ -262,6 +319,15 @@ const MemBridgeDB = (() => {
       statement: 'INSERT INTO mining_history (path, files_found, files_indexed, status) VALUES (?, ?, ?, ?)',
       values: [path, found, indexed, status]
     });
+  }
+
+  async function vacuum() {
+    await db.execute({ database: DB_NAME, statements: "INSERT INTO memories_fts(memories_fts) VALUES('optimize')" });
+    await db.execute({ database: DB_NAME, statements: 'VACUUM' });
+  }
+
+  async function close() {
+    await db.close({ database: DB_NAME });
   }
 
   // ==========================================
@@ -319,12 +385,18 @@ const MemBridgeDB = (() => {
     init,
     addMemory,
     getMemoriesByWing,
+    getMemoriesByRoom,
     search,
     getScenesByWing,
     getSceneMembers,
     createScene,
+    addRelation,
+    getRelatedMemories,
+    addTriple,
     getStatus,
     recordMining,
+    vacuum,
+    close,
     assignMarkers,
     MARKER_COLORS,
   };
