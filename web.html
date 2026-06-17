@@ -3,250 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MemBridge — Memory Palace Demo</title>
+  <title>MemBridge — Memory Palace</title>
   <link rel="stylesheet" href="css/storyboard.css">
   <style>
-    .web-header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 16px;
-      text-align: center;
-    }
-    .web-header h1 {
-      font-size: 20px;
-      margin: 0 0 4px;
-    }
-    .web-header p {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin: 0;
-    }
-    .add-memory-form {
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-    }
-    .add-memory-form input,
-    .add-memory-form textarea,
-    .add-memory-form select {
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 14px;
-      font-family: inherit;
-    }
-    .add-memory-form textarea {
-      min-height: 60px;
-      resize: vertical;
-    }
-    .add-memory-form button {
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      background: var(--marker-a);
-      color: white;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .add-memory-form button:active {
-      transform: scale(0.97);
-    }
-    .palace-map {
-      padding: 16px;
-    }
-    .wing-section {
-      margin-bottom: 20px;
-      background: var(--surface);
-      border-radius: 12px;
-      padding: 16px;
-      border: 1px solid var(--border);
-    }
-    .wing-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .room-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .room-card {
-      background: var(--bg);
-      border-radius: 8px;
-      padding: 12px;
-      border-left: 3px solid var(--marker-a);
-      cursor: pointer;
-    }
-    .room-card:hover {
-      border-left-color: var(--marker-b);
-    }
-    .room-name {
-      font-weight: 600;
-      font-size: 14px;
-      margin-bottom: 4px;
-    }
-    .room-meta {
-      font-size: 11px;
-      color: var(--text-secondary);
-    }
-    .memory-detail {
-      margin-top: 8px;
-      padding: 8px;
-      background: var(--surface);
-      border-radius: 6px;
-      font-size: 12px;
-      display: none;
-    }
-    .memory-detail.open {
-      display: block;
-    }
-    .memory-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .memory-marker {
-      width: 20px;
-      height: 20px;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 10px;
-      color: white;
-      flex-shrink: 0;
-    }
-    .memory-text {
-      flex: 1;
-      font-size: 12px;
-    }
-    .tab-bar {
-      display: flex;
-      border-bottom: 1px solid var(--border);
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 12px;
-      background: none;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 13px;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: all 0.2s;
-    }
-    .tab-btn.active {
-      color: var(--text);
-      border-bottom-color: var(--marker-a);
-    }
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      padding: 16px;
-    }
-    .stat-card {
-      background: var(--surface);
-      border-radius: 12px;
-      padding: 16px;
-      text-align: center;
-      border: 1px solid var(--border);
-    }
-    .stat-value {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--marker-a);
-    }
-    .stat-label {
-      font-size: 11px;
-      color: var(--text-secondary);
-      margin-top: 4px;
-    }
+    .web-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px; text-align: center; }
+    .web-header h1 { font-size: 20px; margin: 0 0 4px; }
+    .web-header p { font-size: 12px; color: var(--text-secondary); margin: 0; }
+    .add-memory-form { padding: 16px; display: flex; flex-direction: column; gap: 8px; background: var(--surface); border-bottom: 1px solid var(--border); }
+    .add-memory-form input, .add-memory-form textarea, .add-memory-form select { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; font-family: inherit; }
+    .add-memory-form textarea { min-height: 60px; resize: vertical; }
+    .add-memory-form button { padding: 12px; border-radius: 8px; border: none; background: var(--marker-a); color: white; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .palace-map { padding: 16px; }
+    .wing-section { margin-bottom: 20px; background: var(--surface); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    .wing-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .room-list { display: flex; flex-direction: column; gap: 8px; }
+    .room-card { background: var(--bg); border-radius: 8px; padding: 12px; border-left: 3px solid var(--marker-a); cursor: pointer; }
+    .room-name { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+    .room-meta { font-size: 11px; color: var(--text-secondary); }
+    .memory-detail { margin-top: 8px; padding: 8px; background: var(--surface); border-radius: 6px; font-size: 12px; display: none; }
+    .memory-detail.open { display: block; }
+    .memory-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .memory-marker { width: 20px; height: 20px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 10px; color: white; flex-shrink: 0; }
+    .memory-text { flex: 1; font-size: 12px; }
+    .memory-img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-top: 4px; }
+    .tab-bar { display: flex; border-bottom: 1px solid var(--border); }
+    .tab-btn { flex: 1; padding: 12px; background: none; border: none; color: var(--text-secondary); font-size: 13px; cursor: pointer; border-bottom: 2px solid transparent; }
+    .tab-btn.active { color: var(--text); border-bottom-color: var(--marker-a); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px; }
+    .stat-card { background: var(--surface); border-radius: 12px; padding: 16px; text-align: center; border: 1px solid var(--border); }
+    .stat-value { font-size: 28px; font-weight: 700; color: var(--marker-a); }
+    .stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+    .btn-secondary { padding: 10px 20px; border-radius: 8px; border: 1px solid var(--marker-b); background: transparent; color: var(--marker-b); cursor: pointer; font-size: 14px; }
+    .edit-btn { font-size: 10px; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border); background: transparent; color: var(--text-secondary); cursor: pointer; margin-left: 8px; }
   </style>
 </head>
 <body>
   <div id="app">
-    <!-- Header -->
     <div class="web-header">
       <h1>🏛️ MemBridge</h1>
-      <p>A memory palace for your mind — no camera required</p>
+      <p>A memory palace for your mind — text &amp; photos</p>
     </div>
 
-    <!-- Tabs -->
     <div class="tab-bar">
       <button class="tab-btn active" data-tab="palace">🏛️ Palace</button>
-      <button class="tab-btn" data-tab="add">✚ Add Memory</button>
+      <button class="tab-btn" data-tab="add">✚ Add</button>
       <button class="tab-btn" data-tab="stats">📊 Stats</button>
     </div>
 
-    <!-- Palace View -->
     <div id="tab-palace" class="tab-content active">
-      <div id="wing-selector" style="padding:12px 16px;display:flex;gap:6px;overflow-x:auto;">
-        <button class="wing-chip active" data-wing="morning">🌅 Morning</button>
-        <button class="wing-chip" data-wing="afternoon">☀️ Afternoon</button>
-        <button class="wing-chip" data-wing="evening">🌆 Evening</button>
-        <button class="wing-chip" data-wing="night">🌙 Night</button>
-        <button class="wing-chip" data-wing="people">👤 People</button>
-        <button class="wing-chip" data-wing="places">📍 Places</button>
-        <button class="wing-chip" data-wing="ideas">💡 Ideas</button>
-      </div>
+      <div id="wing-selector" style="padding:12px 16px;display:flex;gap:6px;overflow-x:auto;"></div>
       <div id="search-bar" style="padding:0 16px 12px;">
         <input type="text" id="search-input" placeholder="🔍 Search your palace...">
       </div>
       <div id="palace-map" class="palace-map"></div>
     </div>
 
-    <!-- Add Memory View -->
     <div id="tab-add" class="tab-content">
       <form class="add-memory-form" id="add-memory-form">
         <select id="mem-wing">
-          <option value="morning">🌅 Morning</option>
-          <option value="afternoon">☀️ Afternoon</option>
-          <option value="evening">🌆 Evening</option>
-          <option value="night">🌙 Night</option>
-          <option value="people">👤 People</option>
-          <option value="places">📍 Places</option>
+          <option value="morning">🌅 Morning</option><option value="afternoon">☀️ Afternoon</option>
+          <option value="evening">🌆 Evening</option><option value="night">🌙 Night</option>
+          <option value="people">👤 People</option><option value="places">📍 Places</option>
           <option value="ideas">💡 Ideas</option>
         </select>
-        <input type="text" id="mem-room" placeholder="Room name (e.g., 'kitchen', 'park_walk')" required>
-        <textarea id="mem-content" placeholder="What do you want to remember? Write it here..." required></textarea>
+        <input type="text" id="mem-room" placeholder="Room name (e.g. 'kitchen', 'park_walk')" required>
         <input type="text" id="mem-title" placeholder="Title (optional)">
+        <textarea id="mem-content" placeholder="What do you want to remember?" required></textarea>
+        <input type="file" id="mem-photo" accept="image/*" style="padding:8px;">
         <button type="submit">🏛️ Place in Palace</button>
       </form>
-      <div id="add-confirm" style="display:none;padding:16px;text-align:center;color:var(--marker-c);font-weight:600;">
-        ✅ Memory placed!
-      </div>
+      <div id="add-confirm" style="display:none;padding:16px;text-align:center;color:var(--marker-c);font-weight:600;">✅ Memory placed!</div>
     </div>
 
-    <!-- Stats View -->
     <div id="tab-stats" class="tab-content">
-      <div class="stats-grid" id="stats-grid">
+      <div class="stats-grid">
         <div class="stat-card"><div class="stat-value" id="stat-memories">0</div><div class="stat-label">Memories</div></div>
-        <div class="stat-card"><div class="stat-value" id="stat-scenes">0</div><div class="stat-label">Scenes</div></div>
         <div class="stat-card"><div class="stat-value" id="stat-wings">0</div><div class="stat-label">Wings</div></div>
         <div class="stat-card"><div class="stat-value" id="stat-rooms">0</div><div class="stat-label">Rooms</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-scenes">0</div><div class="stat-label">Scenes</div></div>
       </div>
       <div style="padding:16px;text-align:center;">
-        <button id="reset-db" style="padding:10px 20px;border-radius:8px;border:1px solid var(--marker-a);background:transparent;color:var(--marker-a);cursor:pointer;">Reset Palace</button>
+        <button id="reset-db" class="btn-secondary">Reset Palace</button>
         <p style="font-size:10px;color:var(--text-secondary);margin-top:8px;">Memories stored in your browser only.</p>
       </div>
     </div>
